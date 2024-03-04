@@ -1,0 +1,13 @@
+#------------------------------------------------------------------------------
+# .gitignore contains patterns of files and directories to be ignored by git
+#------------------------------------------------------------------------------
+
+# ignore Mac system files (in any subdirectory)
+.DS_store
+
+# ignore archive files
+.tar
+.zip
+
+# ignore temporary directory
+tmp
