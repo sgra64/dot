@@ -1,0 +1,89 @@
+#------------------------------------------------------------------------------
+# Properties for mintty terminal used by cygwin and Git-bash, resides in $HOME
+#  - ~/.minttyrc
+#  - ~/.config/mintty/config
+# 
+# see: https://github.com/mintty/mintty/wiki/Tips
+#------------------------------------------------------------------------------
+
+# alternative to set to 40 lines and 100 columns: printf '\e[8;40;100t'
+Rows=56
+Columns=80
+FontHeight=11
+Font=Lucida Console
+
+Term=xterm-direct
+ForegroundColour=128,128,128
+BackgroundColour=30,30,30
+CursorColour=220,50,47
+# Locale=de_DE
+Charset=UTF-8
+
+# - - - - - - - - - - - - - - - - - - - - - - -
+# tuned down colors
+Red=202,102,102
+Green=90,184,20
+BoldColour=255,255,255
+Yellow=204,204,102
+Blue=82,133,224
+Cyan=0,153,153
+Magenta=153,0,153
+# - - - - - - - - - - - - - - - - - - - - - - -
+# A pastel color theme for mintty
+# - https://gist.github.com/pasela/3412915
+# - http://www.rosipov.com/blog/mintty-color-scheme-cygwin/
+# - https://code.google.com/p/mintty/wiki/Tips
+#
+# RGB Color tables
+# - http://www.rapidtables.com/web/color/RGB_Color.htm
+#
+# Values used in LS_COLORS:
+# - Black       - 30
+# - BoldBlack   - 90
+# - White       - 37
+# - BoldWhite   - 37;1
+#
+# - Red         - 31
+# - BoldRed     - 31;1
+# - Green       - 32
+# - BoldGreen   - 32;1
+# - Yellow      - 33
+# - BoldYellow  - 33;1
+# - Blue        - 34
+# - BoldBlue    - 34;1
+# - Magenta     - 35
+# - BoldMagenta - 35;1
+# - Cyan        - 36
+# - BoldCyan    - 36;1
+
+# BoldAsFont=no
+# RightClickAction=paste
+# Font=MesloLGS NF
+# FontHeight=12
+# Term=xterm-256color
+# BoldAsColour=yes
+# ConfirmExit=no
+# Scrollbar=none
+# Transparency=medium
+# OpaqueWhenFocused=yes
+# SelectionShowSize=1
+
+# BackgroundColour=14,14,14
+# ForegroundColour=228,228,228
+# CursorColour=228,228,228
+# Black=40,40,40
+# BoldBlack=107,107,107
+# Red=255,43,28
+# BoldRed=243,91,80
+# Green=2,192,97
+# BoldGreen=0,253,127
+# Yellow=251,188,46
+# BoldYellow=253,197,86
+# Blue=0,126,180
+# BoldBlue=0,179,255
+# Magenta=255,0,194
+# BoldMagenta=239,133,214
+# Cyan=87,208,249
+# BoldCyan=141,219,245
+# White=207,207,207
+# BoldWhite=255,255,255

@@ -1,0 +1,38 @@
+{
+    "comment": "This file contains more VSCode settings (not active).",
+
+    "files.exclude": {
+        "**/.classpath": true,
+        "**/.project": true,
+        "**/.settings": true
+    },
+
+    "java.project.sourcePaths": [ "src" ],
+    "java.project.outputPath": "bin",
+    "java.project.referencedLibraries": [ ],
+
+    "code-runner.defaultLanguage": "java",
+    "code-runner.executorMap": {
+        "java": "echo .vscode/runner.sh $fileName $fileNameWithoutExt application | bash"
+    },
+    "java.dependency.syncWithFolderExplorer": false,
+
+    "docker.dockerPath": "C:\\Program Files\\Docker\\Docker\\resources\\bin",
+    "docker.environment": {
+        "DOCKER_HOST": "tcp://127.0.0.1:2375"
+    },
+
+    "docker.commands.run": "${containerCommand} run --rm -d ${exposedPorts} ${tag}",
+
+    "java.help.firstView": "gettingStarted",
+
+    "git.confirmSync": false,
+    "diffEditor.ignoreTrimWhitespace": false,
+
+    "remote.SSH.configFile": "C:\\Sven1\\svgr\\alpine-python-sshd\\config",
+    "testing.autoRun.mode": "rerun",
+    "java.test.config": {
+
+    },
+    "vscode-spring-boot.rewrite.reconcile-prompt": false
+}

@@ -1,0 +1,75 @@
+//-----------------------------------------------------------------------------
+// System-wide (global) VSCode files:
+// - settings.json                  # general global VS Code settings
+// - launch.json                    # VS Code launch options
+// - keybindings.json               # keyboard short cuts
+//
+// copy on Windows to: C:\Users\svgr2\AppData\Roaming\Code\User
+//-----------------------------------------------------------------------------
+{
+    // Terminal settings to source the project when new terminal is opened
+    // see: https://code.visualstudio.com/docs/terminal/profiles
+    "terminal.integrated.profiles.windows": {
+        //
+        "Bash": {
+            "path": ["bash"],           // invoke bash.exe
+            //"args": ["--init-file", "'${workspaceFolder}'/.vscode/launch_terminal.sh"],
+            "icon": "terminal-bash"
+        },
+        "Cmd": {
+            "path": ["cmd"]             // invoke cmd.exe
+        },
+        "PowerShell": {
+            "path": "powershell",       // invoke powershell.exe
+            // "args": ["-noexit", "-file", "${env:APPDATA}\\PowerShell\\custom-init.ps1"],
+            "args": ["-noexit"]
+        },
+        "Git Bash": null,               // remove from menu
+        "Command Prompt": null,
+        "JavaScript Debug Terminal": null
+    },
+    "terminal.integrated.defaultProfile.windows": "Bash",
+
+    // File settings
+    "files.associations": {
+        "*.rc": "shellscript"
+    },
+    "files.autoSave": "afterDelay",
+    "files.eol": "\n",
+
+    // Editor settings
+    "editor.hover.enabled": true,
+    "editor.hover.delay": 1000,
+    "editor.suggestSelection": "first",
+    "editor.renderWhitespace": "all",
+    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+
+    // Java settings
+    "java.jdt.ls.java.home": "C:/Program Files/Java/jdk-21",
+    "java.inlayHints.parameterNames.enabled": "none",
+    "java.debug.settings.onBuildFailureProceed": true,
+
+    // Maven settings
+    "maven.executable.path": "C:/opt/maven/bin",
+    "maven.settingsFile": "",
+
+    // Java "Code Runner" (extension) settings
+    "code-runner.showExecutionMessage": false,
+    "code-runner.defaultLanguage": "java",
+    "code-runner.clearPreviousOutput": true,
+    "code-runner.executorMap": {
+        "python": "c:/Users/svgr2/AppData/Local/Programs/Python/Python39/python.exe",
+        "java": "java $fileNameWithoutExt",
+        "c": "cd $dir && gcc $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "cpp": "cd $dir && g++ -std=c++14 $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "html": "\"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\""
+    },
+
+    // Docker settings
+    "docker.commands.attach": "${containerCommand} exec -it ${containerId} ${shellCommand}",
+
+    // other settings
+    "security.workspace.trust.untrustedFiles": "open",
+    "window.zoomLevel": 1,
+    "explorer.confirmDelete": false
+}
