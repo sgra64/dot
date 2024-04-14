@@ -10,6 +10,11 @@ declare -gA gt_aliases=(
     ["stat"]="git status"
 )
 
+# short for "git switch" with "main" as default branch
+function switch() {
+    git switch $([[ -z "$1" ]] && echo "main" || echo $@)
+}
+
 # return (echo) git command from shortcut
 function gt_cmd() {
     local args="${@:2:$#}"  # remaining args but first
