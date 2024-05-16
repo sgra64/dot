@@ -82,7 +82,7 @@ and answer questions:
 
 1. What does `->` mean in:
     ```sh
-    lrwxrwxrwx 1  15 Apr 7 11:11 .profile -> .dotfiles/profile.rc
+    lrwxrwxrwx 1  15 Apr 7 11:11 .profile -> .dotfiles/profile.sh
     ```
 
 1. How is it created?

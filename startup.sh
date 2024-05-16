@@ -44,7 +44,7 @@ function startup_common() {
 # execute when cygwin bash starts
 function startup_bash() {
     [[ "$1" != "--no-paths" ]] && \
-        source $dot_path/paths.rc
+        source $dot_path/paths.sh
     # 
     source $dot_path_ext/color.sh
     source $dot_path_ext/prompt.sh
@@ -73,7 +73,7 @@ function startup_gitbash() {
 
 # execute when zsh starts (Mac)
 function startup_zsh() {
-    source $dot_path/paths.rc
+    source $dot_path/paths.sh
     source $dot_path_ext/color.sh
     source $dot_path_ext/prompt.zsh
     source $dot_path_ext/git.sh

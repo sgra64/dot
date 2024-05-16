@@ -7,10 +7,10 @@ function build() {
     local func=$FUNCNAME    # zsh: funcstack[1]
     # 
     declare -A links=(
-        [".profile"  ]=".dot/profile.rc"
-        [".bashrc"   ]=".dot/startup.rc"
-        [".zprofile" ]=".dot/profile.rc"
-        [".zshrc"    ]=".dot/startup.rc"
+        [".profile"  ]=".dot/profile.sh"
+        [".bashrc"   ]=".dot/startup.sh"
+        [".zprofile" ]=".dot/profile.sh"
+        [".zshrc"    ]=".dot/startup.sh"
         [".minttyrc" ]=".dot/mintty.rc"
         [".vimrc"    ]=".dot/vim.rc"
         # [".m2"       ]="/c/Users/svgr2/.m2"
