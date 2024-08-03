@@ -1,0 +1,10 @@
+# ignore everything
+*
+# except following files
+!.gitignore
+!.gitconfig
+
+!.profile
+!.bashrc
+!.zprofile
+!.zshrc

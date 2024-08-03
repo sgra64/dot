@@ -1,0 +1,27 @@
+#------------------------------------------------------------------------------
+# git configuration file with user's system-wide git settings
+#------------------------------------------------------------------------------
+
+[user]
+    name = Sven Graupner
+    email = sgraupner@bht-berlin.de
+
+[core]
+    ignorecase = true       # ignore upper/lower case in filenames
+    autocrlf = false        # disable crlf conversion on checkout
+    filemode = false        # ignore execute bit changes
+    eol = lf                # always use "\n" as end-of-line
+
+[init]
+    defaultBranch = main    # use 'main' as default branch
+
+[alias]                     # call aliases with: git <alias>
+    changed = show --pretty=\"format:\" --name-only
+    conflicts = !git ls-files -u | cut -f 2 | sort -u
+
+## https://stackoverflow.com/questions/45302295/git-falsely-marks-entire-file-as-merge-conflict-on-same-platform
+#[diff "bin"]
+#  textconv = hexdump -v -C
+# 
+# https://stackoverflow.com/questions/424071/how-to-list-all-the-files-in-a-commit
+# git changed 645dfae..b94569f
