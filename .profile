@@ -9,11 +9,14 @@
 #   - .zshrc calls --> .bashrc
 # 
 
+# export TERM=xterm-256color
+# printf '\033[8;56;80t'
+
 # turn on/off logging script execution
-# export LOG=true
-# if [ "$LOG" ]; then
-#     [ "$ZSH" ] && echo .zprofile called; echo .profile called
-# fi
+export LOG=true
+if [ "$LOG" ]; then
+    [ "$ZSH" ] && echo .zprofile $1; echo .profile $1
+fi
 
 # umask 022 permissions of new files are 644 (files) and 755 (directories)
 umask 022
@@ -49,18 +52,25 @@ function env_Windows() {
 }
 
 case $(uname -s) in
-
+    # 
     CYGW*|MINGW*)
         # call function to set up environment on Windows for Cygwin and MINGW (GitBash)
         env_Windows
         # bash does not run .bashrc when terminal opened (call here), zsh runs .zshrc
-        [ -f .bashrc -a ! "$ZSH" ] && source .bashrc
+        [ -f ~/.bashrc -a "$1" != "Win:ZSH" ] && \
+            source ~/.bashrc $([ "$MSYSTEM" ] && echo "Win:MINGW" || echo "Win:CYGWIN")
         ;;
-
+    # 
     *Linux)
-        export STARTUP_PATH="${PATH}"
-        ;;
+        export PATH=".:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        if [ "$WSL_DISTRO_NAME" = "Ubuntu" ]; then
+            # WSL Ubuntu
+            # export PATH+=":/mnt/c/Users/svgr2/AppData/Local/Programs/Microsoft VS Code/bin"
+            [ -f ~/.bashrc ] && source ~/.bashrc "WSL:Ubuntu"
+        fi
 
+        ;;
+    # 
     *) echo '~/.profile: $(uname -s) unmatched' ;;
 esac
 
