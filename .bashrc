@@ -15,6 +15,7 @@ HISTFILESIZE=999
 
 function aliases() {
     local color=$([ "$1" = "color" ] && echo "--color=auto")
+    # 
     alias h="history "
     # alias l="ls -alFog --color=auto "
     # alias ls="ls -A --color=auto "
@@ -28,9 +29,19 @@ function aliases() {
     alias fgrep="fgrep $color"
     alias egrep="egrep $color"
 
+    if [[ "$SYS" =~ WSL:.* ]]; then
+        # Ubuntu merges dotfiles and regular files in directory listings
+        # stackoverflow: "Sorting directory contents (including hidden files) by name"
+        alias l="LC_ALL=C ls -lA --group-directories-first $color "
+        alias ls="LC_ALL=C ls -lA --group-directories-first $color "
+    fi
+
     alias pwd="pwd -LP"     # show real path with resolved links
     alias path="echo \$PATH | tr ':' '\012'"
+    # 
     alias gt="git status"
+    # alias gt="git $([ "$1" != "color" ] && echo "-c color.ui=false ")status"
+    [ "$1" = "color" ] && git config color.ui true || git config color.ui false
 
     function rp() {
         realpath $([ -z "$1" ] && echo . || echo $*)
@@ -45,36 +56,31 @@ case "$1" in
         export PATH="${PATH}:/c/Users/svgr2/AppData/Local/Programs/Microsoft VS Code/bin"
         # 
         # leave .bashrc if called from .zshrc with 'source .bashrc Win:ZSH'
-        # [[ "$1" = "Win:ZSH" ]] && return
+        [[ "$1" = "Win:ZSH" ]] && return
         ;;
     # 
     WSL:*)
         ;;
 esac
 
-
 # date '+%H:%M'
-# set a default prompt of: user@host and current_directory (adjusted from /etc/bash.bashrc)
-# PS1='\[\e]0;\w\a\]\n\[\e[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
-# PS1='\[\e]0;\w\a\]\\\\\\\\\n\[\e[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
-# 
 PROMPT=(
-    white   '\\\\\\\\\\\\\\\\\n'
-    low-green       "\\\u@\h "
-    yellow          "\w "
-    white           "$ "
-    bright-white
+    white   '\\\\\\\\\\\\\\\\\\\\\\\\\\\\n'
+    low-green   '\\\\u@\h '
+    yellow      '\w '
+    reset       '$ '
+    white       # color for typed command
 )
+PROMPT_MONO='\\\\\\\n\u@\h \w $ '
 
-function enable() {
+function default() {
     aliases mono
-    PS1='\\\\\\\n\u@\h \w $ '
+    PS1=$PROMPT_MONO
 }
 
 [ -f ~/.ansi_colors.sh ] && \
     source ~/.ansi_colors.sh && \
-    color on || enable
-
+    color on || default
 
 # remove functions and variables that are no longer needed
-unset enable
+unset default

@@ -57,16 +57,18 @@ case $(uname -s) in
         # call function to set up environment on Windows for Cygwin and MINGW (GitBash)
         env_Windows
         # bash does not run .bashrc when terminal opened (call here), zsh runs .zshrc
+        export SYS=$([ "$MSYSTEM" ] && echo "Win:MINGW" || $([ "$1" ]) && echo $1 || echo "Win:CYGWIN")
         [ -f ~/.bashrc -a "$1" != "Win:ZSH" ] && \
-            source ~/.bashrc $([ "$MSYSTEM" ] && echo "Win:MINGW" || echo "Win:CYGWIN")
+            source ~/.bashrc $SYS
         ;;
     # 
     *Linux)
         export PATH=".:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         if [ "$WSL_DISTRO_NAME" = "Ubuntu" ]; then
+            export SYS="WSL:Ubuntu"
             # WSL Ubuntu
             # export PATH+=":/mnt/c/Users/svgr2/AppData/Local/Programs/Microsoft VS Code/bin"
-            [ -f ~/.bashrc ] && source ~/.bashrc "WSL:Ubuntu"
+            [ -f ~/.bashrc ] && source ~/.bashrc $SYS
         fi
 
         ;;
