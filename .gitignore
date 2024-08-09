@@ -1,6 +1,7 @@
 # ignore everything
-*
-# except following files
+/*
+
+# except following files and directories
 !.gitignore
 !.gitconfig
 
@@ -11,3 +12,5 @@
 !.ansi_colors.sh
 
 !.minttyrc
+
+!.rc-addons/

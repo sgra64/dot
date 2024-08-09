@@ -22,6 +22,8 @@ declare -gA ANSI_COLORS=(
     ["bright-cyan"]="1;96"  # turquoise
     ["bright-white"]="1;97" # boldish bright white
     ["light-red-bg"]="1;101"
+
+    ["broken-link"]="1;4;37;41" # used for broken links (white on red background)
 )
 
 function ansi_code() {
@@ -91,18 +93,22 @@ function color {
         # - fi: file
         # - ow: directory that is other-writable (o+w) and not sticky
         # - ln: symbolic link
+        # - or: orphan, broken symbolic link
+        # - mi: missing file for symbolic link
         # - ex: executable file
         # 
         # export LS_COLORS="di=1;36:ln=1;31:fi=36:ex=36:*.tar=1;37"
         # export LS_COLORS="di=1;97:ow=1;37:ln=1;34:fi=0;37:ex=0;31:*.tar=0;36:*.jar=0;36"
         # 
-        [[ "$SYS" =~ WSL:.* ]] && local ex="low-white" || local ex="dimmed-red"
+        # set dircolors database, show with `dircolors --print-database` command
         export LS_COLORS=$(ls_colors \
             "di"    bright-white \
             "ow"    white \
             "fi"    low-white \
-            "ex"    $([[ "$SYS" =~ WSL:.* ]] && echo "low-white" || echo "red") \
-            "ln"    $([[ "$SYS" =~ WSL:.* ]] && echo "cyan" || echo "blue") \
+            "ex"    red \
+            "ln"    blue \
+            "or"    blue \
+            "mi"    broken-link \
             "*.tar" low-cyan \
             "*.jar" low-cyan \
         )

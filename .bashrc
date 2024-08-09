@@ -1,5 +1,5 @@
 # /etc/bash.bashrc has run before
-[ "$LOG" ] && echo .bashrc $1
+[ "$LOG" = true ] && echo ".bashrc $1"
 
 # test works for bash and zsh
 type shopt &>/dev/null && if [[ $? ]]; then
@@ -15,30 +15,17 @@ HISTFILESIZE=999
 
 function aliases() {
     local color=$([ "$1" = "color" ] && echo "--color=auto")
-    # 
-    alias h="history "
-    # alias l="ls -alFog --color=auto "
-    # alias ls="ls -A --color=auto "
-    # alias grep="grep --color=auto"
-    # alias fgrep="fgrep --color=auto"
-    # alias egrep="egrep --color=auto"
 
+    alias h="history "
+    # example: alias ls="ls -A --color=auto "
     alias l="ls -alFog $color "
     alias ls="ls -A $color "
     alias grep="grep $color"
     alias fgrep="fgrep $color"
     alias egrep="egrep $color"
-
-    if [[ "$SYS" =~ WSL:.* ]]; then
-        # Ubuntu merges dotfiles and regular files in directory listings
-        # stackoverflow: "Sorting directory contents (including hidden files) by name"
-        alias l="LC_ALL=C ls -lA --group-directories-first $color "
-        alias ls="LC_ALL=C ls -lA --group-directories-first $color "
-    fi
-
     alias pwd="pwd -LP"     # show real path with resolved links
     alias path="echo \$PATH | tr ':' '\012'"
-    # 
+
     alias gt="git status"
     # alias gt="git $([ "$1" != "color" ] && echo "-c color.ui=false ")status"
     [ "$1" = "color" ] && git config color.ui true || git config color.ui false
@@ -46,6 +33,8 @@ function aliases() {
     function rp() {
         realpath $([ -z "$1" ] && echo . || echo $*)
     }
+
+    [[ $(type -t sys_setup) == function ]] && sys_setup aliases $1 $color
 }
 
 case "$1" in
