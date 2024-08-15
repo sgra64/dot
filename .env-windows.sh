@@ -38,9 +38,6 @@ function env_Windows() {
         COMMONPROGRAMFILES PROCESSOR_IDENTIFIER SESSIONNAME HOMEPATH TMP ProgramW6432 \
         MINTTY_SHORTCUT WINDIR FPS_BROWSER_APP_PROFILE_STRING PROCESSOR_ARCHITECTURE \
         PUBLIC SYSTEMDRIVE OneDriveCommercial OLDPWD ProgramData
-    # 
-    [ "$SYS" != "Win:ZSH" ] && \
-        unset ProgramFiles\(x86\) CommonProgramFiles\(x86\)
 
     # ignore Windows \r line ends, otherwise error: '\r': command not found in .bashrc
     (set -o igncr) 2>/dev/null && set -o igncr;

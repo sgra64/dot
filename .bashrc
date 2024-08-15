@@ -63,17 +63,18 @@ function aliases() {
     local color=$([ "$1" = "color" ] && echo "--color=auto")
     # 
     alias c="clear "
-    # example: alias ls="ls -A --color=auto "
-    alias ls="/bin/ls $color "  # colorize ls output
-    alias l="ls -alFog "        # detailed list with dotfiles
-    alias ll="ls -l "           # detailed list with no dotfiles
-    alias grep="grep $color "
-    alias fgrep="fgrep $color "
-    alias egrep="egrep $color "
-    alias pwd="pwd -LP "        # show real path with resolved links
+    alias ls="/bin/ls $color"   # colorize ls output
+    alias l="ls -alFog"         # detailed list with dotfiles
+    alias ll="ls -l"            # detailed list with no dotfiles
+    alias grep="grep $color"
+    alias egrep="egrep $color"
+    alias pwd="pwd -LP"         # show real path with resolved links
     alias path="echo \$PATH | tr ':' '\012'"
     # 
+    # git aliases
     alias gt="git status"
+    alias switch="git switch"
+    alias log="git log --oneline"
 
     function rp() {
         realpath $([ -z "$1" ] && echo . || echo $*)
@@ -202,7 +203,3 @@ function color() {
 
 [ "$PROMPT_COLOR" ] && \
     color $PROMPT_COLOR || color $TERM_HAS_COLORS
-
-# force cd overlay function to execute when new bash is launched
-# cd .
-# [[ "$SHLVL" -gt 1 ]] && cd .
