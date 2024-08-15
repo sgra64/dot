@@ -9,8 +9,9 @@
 !.bashrc
 !.zprofile
 !.zshrc
-!.ansi_colors.sh
+
+!.env-windows.sh
+!.ansi-colors.sh
+!.git-prompt.sh
 
 !.minttyrc
-
-!.rc-addons/

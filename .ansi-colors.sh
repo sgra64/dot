@@ -2,6 +2,8 @@
 # - https://en.wikipedia.org/wiki/ANSI_escape_code
 # - https://askubuntu.com/questions/466198/how-do-i-change-the-color-for-directories-with-ls-in-the-console
 # - https://www.howtogeek.com/307701/how-to-customize-and-colorize-your-bash-prompt
+# 
+[ "$LOG" = true ] && echo ".ansi_colors.sh $1"
 
 declare -gA ANSI_COLORS=(
     ["black"]="1;30"
@@ -32,29 +34,24 @@ function ansi_code() {
     local reset="\[\e[0m\]"     # alternatively: "\[\033[0m\]"
     # 
     case "$code" in
-    "reset")    printf "$reset$text" ;;
+    "reset")    printf "%s%s" "$reset" "$text" ;;
     "0")        printf "0" ;;
     *)          local esc=${ANSI_COLORS[$code]}
                 [ "$text" = "--unterminated" ] && text="" && reset=""
-                [ "$esc" ] && printf "\[\e["$esc"m\]$text$reset" ;;
+                [ "$esc" ] && printf "\[\e[%sm\]%s%s" "$esc" "$text" "$reset" ;;
     esac
 }
 
-function build_prompt() {
-    # problem: Cygwin bash prompt is wrapping lines on the same line
-    # https://superuser.com/questions/283236/cygwin-bash-prompt-is-wrapping-lines-on-the-same-line
-    # PS1='\[\e[32m\]\u@\h:\W> \[\e[0m\]'
-    # 
+function colorize_prompt() {
+    # arg1 tells to set color (true) or not (false)
     local s=0; local code=""; local e=""
     for k in "$@"; do
-        [ "$s" = 0 -a "$k" = "mono" ] && s=10 && continue
-        [ "$s" = 0 -a "$k" = "color" ] && s=20 && continue
+        [ "$s" = 0 -a "$k" = false ] && s=10 && continue
+        [ "$s" = 0 -a "$k" = true ] && s=20 && continue
         # 
-        # mono prompt
+        # monochrome prompt
         [ "$s" = 10 ] && s=11 && continue
-        # [ "$s" = 11 ] && s=10 && e+="$k" && continue
-        # [ "$s" = 11 ] && s=10 && e+=$(ansi_code "reset" "$k") && continue
-        [ "$s" = 11 ] && s=10 && e+=$(echo "$k" | sed -e 's/\\//g') && continue
+        [ "$s" = 11 ] && s=10 && e+="$k" && continue
         # 
         # colored prompt
         [ "$s" = 20 ] && s=21 && code="$k" && continue
@@ -62,75 +59,22 @@ function build_prompt() {
             e+=$(ansi_code "$code" "$k") && \
             code="" && continue
     done;
+    # 
     # append unterminated color code (no '\[\e[0m\]' after text) to
     # allow colored typing (commands)
-    [ "$code" ] && e+=$(ansi_code "$code" "--unterminated")
+    [ "$1" = true ] && [ "$code" ] && e+=$(ansi_code "$code" "--unterminated")
     # 
-    printf "$e"     # output sequence for PS1 (must quote "$e")
+    printf "%s" "$e"    # output sequence for PS1 (must quote "$e")
 }
 
-function color {
-    local onoff=$1
-    #
-    function ls_colors() {
-        local s=0; local e=""
-        for k in "$@"; do
-            [ "$s" = 1 ] && e+="${ANSI_COLORS[$k]}" && s=2
-            [ "$s" = 0 ] && e+="$k=" && s=1
-            [ "$s" = 2 ] && e+=":" && s=0
-        done;
-        printf "$e"     # output sequence for LS_COLORS (must quote "$e")
-    }
-    # 
-    # Only enable color when terminal supports colors. Test with $(tput colors),
-    # see: https://tldp.org/HOWTO/Bash-Prompt-HOWTO/x405.html
-    if [ "$onoff" = "on" ] && [ "$(tput colors)" ]; then
-        export TERM="xterm-256color"
-        #
-        # Set coloring scheme for 'ls' command (with --color=auto)
-        # https://www.bigsoft.co.uk/blog/2008/04/11/configuring-ls_colors
-        # - di: directory
-        # - fi: file
-        # - ow: directory that is other-writable (o+w) and not sticky
-        # - ln: symbolic link
-        # - or: orphan, broken symbolic link
-        # - mi: missing file for symbolic link
-        # - ex: executable file
-        # 
-        # export LS_COLORS="di=1;36:ln=1;31:fi=36:ex=36:*.tar=1;37"
-        # export LS_COLORS="di=1;97:ow=1;37:ln=1;34:fi=0;37:ex=0;31:*.tar=0;36:*.jar=0;36"
-        # 
-        # set dircolors database, show with `dircolors --print-database` command
-        export LS_COLORS=$(ls_colors \
-            "di"    bright-white \
-            "ow"    white \
-            "fi"    low-white \
-            "ex"    red \
-            "ln"    blue \
-            "or"    blue \
-            "mi"    broken-link \
-            "*.tar" low-cyan \
-            "*.jar" low-cyan \
-        )
-        aliases color
-        # 
-        PS1=$(build_prompt color "${PROMPT[@]}")
-        trap "echo -ne '\e[m'" DEBUG    # reset formatting after command + ENTER
-    fi
-    # 
-    if [ "$onoff" = "off" ] || [ -z "$(tput colors)" ]; then
-        export TERM="xterm-mono"    # alternative: "dumb" to disable colors in vi
-        export LS_COLORS=$(ls_colors \
-            "rs" 0 "di" 0 "ln" 0 "mh" 0 "pi" 0 "so" 0 "do" 0 "bd" 0 \
-            "cd" 0 "or" 0 "mi" 0 "su" 0 "sg" 0 "ca" 0 "tw" 0 "ow" 0 \
-            "st" 0 "ex" 0 \
-        )
-        aliases mono
-        # 
-        # PS1=$(build_prompt mono "${PROMPT[@]}")
-        PS1=$PROMPT_MONO
-        trap "" DEBUG
-    fi
+function colorize_ls_colors() {
+    local s=0; local e=""
+    for k in "$@"; do
+        [ "$s" = 1 ] && e+="${ANSI_COLORS[$k]}" && s=2
+        [ "$s" = 0 ] && e+="$k=" && s=1
+        [ "$s" = 2 ] && e+=":" && s=0
+    done;
+    printf "%s" "$e"     # output sequence for LS_COLORS (must quote "$e")
 }
 
 # function show_colors() {
@@ -138,7 +82,7 @@ function color {
 #     function CLR() {
 #         for k in "$@"; do
 #             local col=${ANSI_COLORS[$k]}
-#             [ "$col" ] && printf "\[\e["${col}"m\]" || printf "%s" "$k"
+#             [ "$col" ] && printf "%s" "\[\e["${col}"m\]" || printf "%s" "$k"
 #         done
 #     }
 #     echo "yellow:" $(CLR reset dimmed-yellow "##" low-yellow "##" bright-yellow "##" reset "##")
@@ -151,13 +95,12 @@ function color {
 #     # 
 #     for i in "dimmed-" "low-" "" "bright-"; do
 #         for j in grey red green yellow blue purple cyan white; do
-#             printf "$(CLR $i$j "xx")"
+#             printf "%s" "$(CLR $i$j "xx")"
 #         done
 #         echo
 #     done
 #     printf "\[\e[0m\]"
 # }
-
 
 # Put the cursor at line L and column C \033[<L>;<C>H
 # Put the cursor at line L and column C \033[<L>;<C>f
