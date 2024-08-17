@@ -24,7 +24,7 @@
 # .ansi-colors.sh
 # - ansi_code(), colorize_prompt(), colorize_ls_colors()
 # 
-# .git-prompt.sh
+# .git-cd.sh
 # - GIT_PROJECT: 
 # - GIT_PATH: 
 # - cd()
@@ -41,13 +41,14 @@ type shopt &>/dev/null && if [[ $? ]]; then
     # append to the history file, don't overwrite it
     shopt -s histappend
 fi
+# https://www.baeldung.com/linux/history-remove-avoid-duplicates
 # don't put duplicate lines or lines with whitespaces in history
-HISTCONTROL=ignoreboth
-HISTSIZE=999
-HISTFILESIZE=999
+export HISTCONTROL=ignoreboth:erasedups
+export HISTSIZE=999
+export HISTFILESIZE=999
 
-[ "$HAS_GIT" = true ] && [ -f ~/.git-prompt.sh ] && \
-    source ~/.git-prompt.sh
+[ "$HAS_GIT" = true ] && [ -f ~/.git-cd.sh ] && \
+    source ~/.git-cd.sh
 
 # source color control functions for ANSI terminals
 [ -f ~/.ansi-colors.sh ] && \

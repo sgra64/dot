@@ -12,6 +12,6 @@
 
 !.env-windows.sh
 !.ansi-colors.sh
-!.git-prompt.sh
+!.git-cd.sh
 
 !.minttyrc
