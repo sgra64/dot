@@ -34,7 +34,6 @@
 # /etc/bash.bashrc has run before
 [ "$LOG" = true ] && echo ".bashrc"
 
-# test works for bash and zsh
 type shopt &>/dev/null && if [[ $? ]]; then
     # check window size after each command and update values of LINES and COLUMNS
     shopt -s checkwinsize
@@ -72,17 +71,19 @@ function aliases() {
     alias pwd="pwd -LP"         # show real path with resolved links
     alias path="echo \$PATH | tr ':' '\012'"
     # 
-    # git aliases
-    alias gt="git status"
-    alias switch="git switch"
-    alias log="git log --oneline"
+    # set git aliases
+    [ "$HAS_GIT" = true ] && \
+        alias gt="git status" && \
+        alias switch="git switch" && \
+        alias log="git log --oneline"
 
     function rp() {
-        realpath $([ -z "$1" ] && echo . || echo $*)
+        [[ "$1" ]] && realpath $* || realpath .
+        # realpath $([[ -z "$1" ]] && echo . || echo $*)
     }
     function h() {
-        [ "$1" == "-all" ] && history && return
-        [ "$1" ] && history | grep $1 || history | tail -40
+        [[ "$1" == "--all" ]] && history | uniq -f 1 && return
+        [[ "$1" ]] && history | grep $1 | uniq -f 1 || history | tail -40
     }
 }
 
@@ -93,7 +94,7 @@ function prompt() {
         # GNU prompt control sequences for PS1 variable
         # https://www.gnu.org/software/bash/manual/html_node/Controlling-the-Prompt.html
         # PS1='\[\e[32m\]\u@\h:\W> \[\e[0m\]'
-        local reg_prompt=(
+        local regular_prompt=(
             white       '\\\\\\\n'
             green       '\! '           # \! history number, \# command number
             low-green   '\u@\047$HOSTNAME_ALIAS\047 '   # \u user, \h hostname
@@ -103,7 +104,7 @@ function prompt() {
             reset       '\012'          # \012 newline
             white       # color for typed command
         )
-        PS1=$(colorize_prompt "$PROMPT_COLOR" "${reg_prompt[@]}")
+        PS1=$(colorize_prompt "$PROMPT_COLOR" "${regular_prompt[@]}")
     # 
     else
         # prompt inside git project
@@ -113,7 +114,8 @@ function prompt() {
             low-green   '\u@\047$HOSTNAME_ALIAS\047 '   # \u user, \h hostname
             blue        "$GIT_PROJECT "
             white       '['
-            purple      '$(git branch --show-current)'
+            # purple      '$(git branch --show-current)'    # not working on Ubuntu
+            purple      '$(git symbolic-ref --short HEAD 2>/dev/null)'
             white       '] '
             yellow      "$GIT_PATH"
             reset       '\012'          # \012 newline
@@ -175,12 +177,10 @@ function color() {
                 "or"    cyan \
             ) ;;
         esac
-        # 
         aliases color
 
-        [ "$HAS_GIT" = true ] && \
-            git config color.ui true
-        # 
+        [ "$HAS_GIT" = true ] && git config color.ui true
+
         export PROMPT_COLOR=true
         prompt
     # 
@@ -194,9 +194,9 @@ function color() {
             "st" 0 "ex" 0 \
         )
         aliases mono
-        [ "$HAS_GIT" = true ] && \
-            git config color.ui false
-        # 
+
+        [ "$HAS_GIT" = true ] && git config color.ui false
+
         export PROMPT_COLOR=false
         prompt
     fi

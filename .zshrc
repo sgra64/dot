@@ -4,21 +4,28 @@
 # run .bashrc
 [ -f .bashrc ] && source .bashrc $([ "$WINDIR" ] && echo "Win:ZSH" || echo "Mac:ZSH")
 
-# ZSH: 
-PROMPT=$'%{\e[32m%}> %{\e[0m%}'
+# PROMPT=$(colorize_prompt true "${reg_prompt[@]}")
+# PROMPT=$'%{\e[32m%}> \u \h %{\e[0m%}'
+# PROMPT="%F{green}hi>%f "
+# 
+# https://stackoverflow.com/questions/30199068/zsh-prompt-and-hostname
+# https://stackoverflow.com/questions/57469946/dark-grey-background-color-in-zsh-using-autoload
+autoload -U colors && colors
+PS1="%{$fg[green]%}"
+PS1+="%! "                      # history number
+PS1+="%n@'${HOSTNAME_ALIAS}'"   # username from env variable
+PS1+="%{$fg[white]%}"
+PS1+=" (%T)"                    # time
+# 
+PS1+=" %{$fg_bold[yellow]%}"    # path in bright yellow
+PS1+="%~ "                      # show current path relative to ~
+# 
+# PS1+=$'\e[1;33m '               # bright yellow in ANSI ESC spoils line end control
+# PS1+="%~ "                      # show current path relative to ~
+# PS1+=$'\e[0m'                   # reset coloring, spoils line end control
+# PS1+=$'\[\e[0m\]'
+# 
+PS1+="%{$reset_color%}%"
+PS1+=" > "
 
-        
-# function ansi_code_ZSH() {
-#     # https://stackoverflow.com/questions/30568258/using-ansi-escape-sequences-in-zsh-prompt
-#     local code=$1
-#     local text=$2
-#     local reset='%{\e[0m%}'     # alternatively: "\[\033[0m\]"
-#     # 
-#     case "$code" in
-#     "reset")    printf "%s%s" "$reset" "$text" ;;
-#     "0")        printf "0" ;;
-#     *)          local esc=${ANSI_COLORS[$code]}
-#                 [ "$text" = "--unterminated" ] && text="" && reset=""
-#                 [ "$esc" ] && printf '%%{\e[%sm%%}%s%s' "$esc" "$text" "$reset" ;;
-#     esac
-# }
+cd ~

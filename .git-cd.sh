@@ -5,7 +5,7 @@ export GIT_PATH=""
 
 # overlay cd to update $GIT_PROJECT and $GIT_PATH
 function cd() {
-    local git_project_prior=$GIT_PROJECT
+    local prior_value_of_GIT_PROJECT=$GIT_PROJECT
     local cd_path=$( [ -z "$1" ] && echo $HOME || echo $1 ); shift
     # 
     # actually change directory
@@ -31,12 +31,14 @@ function cd() {
     prompt
 
     # test git-project was entered for the first time
-    if [ -z "$git_project_prior" -a "$GIT_PROJECT" ]; then
-        # entering $GIT_PROJECT
-        echo "entering GIT_PROJECT: $GIT_PROJECT"
+    if [ -z "$prior_value_of_GIT_PROJECT" -a "$GIT_PROJECT" ]; then
+        # sourcing when $GIT_PROJECT is entered
+        # echo "entering GIT_PROJECT in: $dir"
+        [ -f $dir/.env.sh ] && source $dir/.env.sh $GIT_PROJECT $dir && setup
     fi
-    if [ "$git_project_prior" -a -z "$GIT_PROJECT" ]; then
-        # leaving $git_project_prior
-        echo "leaving GIT_PROJECT: $git_project_prior"
+    if [ "$prior_value_of_GIT_PROJECT" -a -z "$GIT_PROJECT" ]; then
+        # wiping when leaving project
+        # echo "leaving GIT_PROJECT: $prior_value_of_GIT_PROJECT"
+        [ "$(typeset -f wipe)" ] && wipe $prior_value_of_GIT_PROJECT $dir
     fi
 }

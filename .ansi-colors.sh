@@ -1,4 +1,4 @@
-# ANSI colors and terminal control sequences
+# ANSI terminal control sequences for colors:
 # - https://en.wikipedia.org/wiki/ANSI_escape_code
 # - https://askubuntu.com/questions/466198/how-do-i-change-the-color-for-directories-with-ls-in-the-console
 # - https://www.howtogeek.com/307701/how-to-customize-and-colorize-your-bash-prompt
@@ -77,38 +77,25 @@ function colorize_ls_colors() {
     printf "%s" "$e"     # output sequence for LS_COLORS (must quote "$e")
 }
 
-# function show_colors() {
-#     # 
-#     function CLR() {
-#         for k in "$@"; do
-#             local col=${ANSI_COLORS[$k]}
-#             [ "$col" ] && printf "%s" "\[\e["${col}"m\]" || printf "%s" "$k"
-#         done
-#     }
-#     echo "yellow:" $(CLR reset dimmed-yellow "##" low-yellow "##" bright-yellow "##" reset "##")
-#     echo "red:   " $(CLR reset dimmed-red "##" low-red "##" bright-red "##" reset "##")
-#     echo "purple:" $(CLR reset dimmed-purple "##" low-purple "##" bright-purple "##" reset "##")
-#     echo "blue:  " $(CLR reset dimmed-blue "##" low-blue "##" bright-blue "##" reset "##")
-#     echo "cyan:  " $(CLR reset dimmed-cyan "##" low-cyan "##" bright-cyan "##" reset "##")
-#     echo "green: " $(CLR reset dimmed-green "##" low-green "##" bright-green "##" reset "##")
-#     echo
-#     # 
-#     for i in "dimmed-" "low-" "" "bright-"; do
-#         for j in grey red green yellow blue purple cyan white; do
-#             printf "%s" "$(CLR $i$j "xx")"
-#         done
-#         echo
-#     done
-#     printf "\[\e[0m\]"
-# }
 
-# Put the cursor at line L and column C \033[<L>;<C>H
-# Put the cursor at line L and column C \033[<L>;<C>f
-# Move the cursor up N lines            \033[<N>A
-# Move the cursor down N lines          \033[<N>B
-# Move the cursor forward N columns     \033[<N>C
-# Move the cursor backward N columns    \033[<N>D
-# Clear the screen, move to (0,0)       \033[2J
-# Erase to end of line                  \033[K
-# Save cursor position                  \033[s
-# Restore cursor position               \033[u
+# https://stackoverflow.com/questions/6159856/how-do-zsh-ansi-colour-codes-work
+# for COLOR in {0..255}; do
+#     for STYLE in "38;5"; do 
+#         TAG="\033[${STYLE};${COLOR}m"
+#         STR="${STYLE};${COLOR}"
+#         echo -ne "${TAG}${STR}${NONE}  "
+#     done
+#     echo
+# done
+
+# further control sequences for ANSI terminal:
+# - Put the cursor at line L and column C \033[<L>;<C>H
+# - Put the cursor at line L and column C \033[<L>;<C>f
+# - Move the cursor up N lines            \033[<N>A
+# - Move the cursor down N lines          \033[<N>B
+# - Move the cursor forward N columns     \033[<N>C
+# - Move the cursor backward N columns    \033[<N>D
+# - Clear the screen, move to (0,0)       \033[2J
+# - Erase to end of line                  \033[K
+# - Save cursor position                  \033[s
+# - Restore cursor position               \033[u

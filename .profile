@@ -32,9 +32,8 @@ esac
 case $(uname -s) in
     # 
     CYGW*|MINGW*)
+        # also sets SYS=Win:ZSH / SYS=Mac:ZSH when passed as $1
         export SYS=$([ "$MSYSTEM" ] && echo "Win:MINGW" || $([ "$1" ]) && echo $1 || echo "Win:CYGWIN")
-        # 
-        # source_addons $sys     # call before env_Windows
         # 
         # call function to set up environment on Windows for Cygwin and MINGW (GitBash)
         [ -f ~/.env-windows.sh ] && \
@@ -54,14 +53,20 @@ case $(uname -s) in
     *) echo '~/.profile: $(uname -s) unmatched' ;;
 esac
 
-[ -z "$HAS_GIT" ] && \
-    export HAS_GIT=$(git --version >/dev/null 2>/dev/null; [[ $? = 0 ]] && echo true || echo false)
+if [[ ! "$SYS" =~ .*ZSH ]]; then
+    # none-zsh: test system has git installed, HAS_GIT: true, false
+    [ -z "$HAS_GIT" ] && \
+        export HAS_GIT=$(git --version >/dev/null 2>/dev/null; [[ $? = 0 ]] && echo true || echo false)
+    # 
+    # bash does not automatically run .bashrc with new terminal, zsh runs .zshrc
+    [ -f ~/.bashrc ] && \
+        source ~/.bashrc
+else
+    # zsh: git-cd.sh works only for bash
+    export HAS_GIT=false
+fi
 
-# bash does not run .bashrc when terminal opened (call here), zsh runs .zshrc
-[ -f ~/.bashrc -a "$1" != "Win:ZSH" ] && \
-    source ~/.bashrc
-
-# show dotfiles first and not merged with 'ls' (as WSL:Ubuntu did)
+# show dotfiles first and not merged for 'ls'-list (as WSL:Ubuntu does)
 export LC_COLLATE="C"
 
 # remove functions and variables no longer needed
