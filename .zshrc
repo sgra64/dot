@@ -28,4 +28,8 @@ PS1+="%~ "                      # show current path relative to ~
 PS1+="%{$reset_color%}%"
 PS1+=" > "
 
+
+# otherwise, commands like: wc $(find tmp -name '*.py') ill-process first line
+trap "" DEBUG
+
 cd ~

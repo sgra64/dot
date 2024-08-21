@@ -9,19 +9,20 @@ function env_Windows() {
     # local append_path="$(cygpath ${SYSTEMROOT}):$(cygpath ${SYSTEMROOT})/system32"
     local append_path="$(cygpath ${SYSTEMROOT})"
     # 
+    # https://medium.com/@linuxadminhacks/understanding-ifs-in-bash-scripting-3c67a39661e9
     IFS=@; for p in $(echo $PATH | tr ':' '@'); do
         case "$p" in
         *system32|*PowerShell*|*WindowsApps*)
             append_path+=":$(cygpath $p)"
         esac
-    done; IFS=
+    done; unset IFS     # reset IFS to default values (space, tab, newline)
     # 
     # probe git is present, either cygwin git or GitBash git
     local git_path=$(which git 2>/dev/null)
-    [ "$git_path" ] && git_path=$(dirname $(cygpath $git_path))
+    [ "$git_path" ] && git_path=$(cygpath "$git_path") && git_path=$(dirname "$git_path")
     # 
     local vscode_path=$(which code 2>/dev/null)
-    [ "$vscode_path" ] && vscode_path=$(dirname $(cygpath $vscode_path))
+    [ "$vscode_path" ] && vscode_path=$(cygpath "$vscode_path") && vscode_path=$(dirname "$vscode_path")
     # 
     # reset PATH, remove windows entries
     export PATH=".:/usr/local/bin:/usr/bin:/bin:$append_path"
