@@ -60,9 +60,9 @@ export HISTFILESIZE=999
 
 
 function aliases() {
-    local color=$([ "$1" = "color" ] && echo "--color=auto")
+    [ "$1" = "color" ] && local color="--color=auto"
     # 
-    alias c="clear "
+    alias c="clear"
     alias ls="/bin/ls $color"   # colorize ls output
     alias l="ls -alFog"         # detailed list with dotfiles
     alias ll="ls -l"            # detailed list with no dotfiles
@@ -71,7 +71,6 @@ function aliases() {
     alias pwd="pwd -LP"         # show real path with resolved links
     alias path="echo \$PATH | tr ':' '\012'"
     # 
-    # set git aliases
     [ "$HAS_GIT" = true ] && \
         alias gt="git status" && \
         alias switch="git switch" && \
@@ -132,15 +131,13 @@ function prompt() {
 }
 
 function color() {
-    # [ "$1" = "color" ] && color true && return
-    # [ "$1" = "mono" ] && color false && return
     [ "$1" = "on" ] && color true && return
     [ "$1" = "off" ] && color false && return
     # 
     if [ "$1" = true ] && [ "$TERM_HAS_COLORS" = true ]; then
         # 
-        export TERM="xterm-direct"      # default terminal (ANSI colors)
-        # export TERM="xterm-256color"
+        # vim coloring requires "xterm-256color"
+        export TERM="xterm-256color"
         #
         # Set coloring scheme for 'ls' command (with --color=auto)
         # https://www.bigsoft.co.uk/blog/2008/04/11/configuring-ls_colors
