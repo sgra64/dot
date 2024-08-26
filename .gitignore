@@ -9,8 +9,6 @@
 !.bashrc
 !.zprofile
 !.zshrc
-
-!.env-windows.sh
 !.ansi-colors.sh
 
 !.minttyrc
