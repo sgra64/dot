@@ -1,6 +1,5 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # .profile:
-# - LOG: true, false
 # - SYS: Win:CYGWIN, Win:MINGW, Win:ZSH, WSL:Ubuntu, Linux
 # - PATH: path
 # - HOSTNAME_ALIAS: alias name for system hostname, e.g. 'X1' for 'LAPTOP-V50CGD0T'
@@ -30,10 +29,6 @@
 # - cd()
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-
-# /etc/bash.bashrc has run before
-[ "$LOG" = true ] && echo ".bashrc"
-
 type shopt &>/dev/null && if [[ $? ]]; then
     # check window size after each command and update values of LINES and COLUMNS
     shopt -s checkwinsize
@@ -46,16 +41,20 @@ export HISTCONTROL=ignoreboth:erasedups
 export HISTSIZE=999
 export HISTFILESIZE=999
 
+# source PATH variable from ~/.pathrc file for Windows environment
+[ -f ~/.path_rc ] && [[ "$SYS" =~ Win:. ]] && \
+    source ~/.path_rc
+
 # source color control functions for ANSI terminals
 [ -f ~/.ansi-colors.sh ] && \
     source ~/.ansi-colors.sh
 
 [ -z "$TERM_HAS_COLORS" ] && \
-    export TERM_HAS_COLORS=$([[ "$(tput colors)" -gt "1" ]] && \
+    export TERM_HAS_COLORS=$([[ "$(tput colors)" -gt 1 ]] && \
         [ "$(typeset -f ansi_code)" ] && \
         echo true || echo false)
 
-# Overlay 'cd' command for PS1 prompt used within git projects,
+# overlay 'cd' command for PS1 prompt used within git projects,
 # defines variables GIT_PROJECT with the name of git project and
 # GIT_PATH with the path of git project
 [ "$HAS_GIT" = true ] && \
@@ -79,8 +78,7 @@ export HISTFILESIZE=999
         # 
         [ "$git_project" ] && \
             local path=$(pwd) && \
-            export GIT_PATH=${path/"$dir"/\.} || \
-            export GIT_PATH=""
+            export GIT_PATH=${path/"$dir"/\.} || unset GIT_PATH
         # 
         # rebuild PS1 using the prompt function
         export GIT_PROJECT=$git_project
@@ -90,17 +88,17 @@ export HISTFILESIZE=999
         if [ -z "$prior_value_of_GIT_PROJECT" -a "$GIT_PROJECT" ]; then
             # sourcing when $GIT_PROJECT is entered
             # echo "entering GIT_PROJECT in: $dir"
-            [ -f $dir/.env.sh ] && source $dir/.env.sh $GIT_PROJECT $dir && setup
+            [ -f "$dir"/.env.sh ] && source "$dir"/.env.sh "$GIT_PROJECT" "$dir" && setup
         fi
         if [ "$prior_value_of_GIT_PROJECT" -a -z "$GIT_PROJECT" ]; then
             # wiping when leaving project
             # echo "leaving GIT_PROJECT: $prior_value_of_GIT_PROJECT"
-            [ "$(typeset -f wipe)" ] && wipe $prior_value_of_GIT_PROJECT $dir
+            [ "$(typeset -f wipe)" ] && wipe "$prior_value_of_GIT_PROJECT" "$dir"
         fi
     }
 
 function aliases() {
-    [ "$1" = "color" ] && local color="--color=auto"
+    [ "$1" = "color" ] && local color="--color=auto" || local mvn_mono="-B"
     # 
     alias c="clear"
     alias vi="vim"              # use vim for vi, -u ~/.vimrc
@@ -111,19 +109,33 @@ function aliases() {
     alias egrep="egrep $color"
     alias pwd="pwd -LP"         # show real path with resolved links
     alias path="echo \$PATH | tr ':' '\012'"
+    [ "$MAVEN_HOME" ] && \
+        alias mvn="$MAVEN_HOME/bin/mvn $mvn_mono"   # -B: color off
     # 
+    # set useful git aliases \
     [ "$HAS_GIT" = true ] && \
         alias gt="git status" && \
         alias switch="git switch" && \
         alias log="git log --oneline"
 
-    function rp() {
+    function rp() {     # show realpath of $1
         [[ "$1" ]] && realpath $* || realpath .
-        # realpath $([[ -z "$1" ]] && echo . || echo $*)
     }
-    function h() {
+    function h() {      # list history commands, select by $1
         [[ "$1" == "--all" ]] && history | uniq -f 1 && return
         [[ "$1" ]] && history | grep $1 | uniq -f 1 || history | tail -40
+    }
+    function crlf() {   # list text files with CR/LF (Windows) line endings
+        [[ "$1" ]] && local dir="$*" || local dir="."
+        find "$dir" -not -type d -exec file "{}" ";" | grep CRLF | cut -d: -f1
+    }
+    function cr2lf() {  # replace CR/LF (Windows) with newline (Unix) line endings
+        for f in $(crlf "$*"); do
+            echo "-- converting CRLF to '\n' in --> $f"
+            tmpfile="/tmp/$(basename "$f")"
+            sed 's/\r$//' < "$f" > "$tmpfile"
+            mv "$tmpfile" "$f"
+        done
     }
 }
 

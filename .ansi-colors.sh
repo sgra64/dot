@@ -1,9 +1,9 @@
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # ANSI terminal control sequences for colors:
 # - https://en.wikipedia.org/wiki/ANSI_escape_code
 # - https://askubuntu.com/questions/466198/how-do-i-change-the-color-for-directories-with-ls-in-the-console
 # - https://www.howtogeek.com/307701/how-to-customize-and-colorize-your-bash-prompt
-# 
-[ "$LOG" = true ] && echo ".ansi_colors.sh $1"
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 declare -gA ANSI_COLORS=(
     ["black"]="1;30"

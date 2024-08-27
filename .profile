@@ -1,3 +1,4 @@
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # shell executes in order:
 # - bash:
 #   - /etc/profile
@@ -12,10 +13,7 @@
 # printf '\033[8;56;80t'
 
 # turn on/off logging script execution
-export LOG=false
-if [ "$LOG" = true ]; then
-    [ "$ZSH" ] && echo ".zprofile $1; echo .profile $1"
-fi
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # umask 022 permissions of new files are 644 (files) and 755 (directories)
 umask 022
@@ -49,7 +47,7 @@ case $(uname -s) in
             # https://medium.com/@linuxadminhacks/understanding-ifs-in-bash-scripting-3c67a39661e9
             IFS=@; for p in $(echo $PATH | tr ':' '@'); do
                 case "$p" in
-                *system32|*PowerShell*|*WindowsApps*)
+                *system32|*PowerShell*)         # |*WindowsApps*)
                     append_path+=":$(cygpath $p)"
                 esac
             done; unset IFS     # reset IFS to default values (space, tab, newline)
@@ -69,14 +67,14 @@ case $(uname -s) in
             # 
             export PATH
 
-            # remove unessesary environment variables inherited from Windows for none-zsh
+            # except for zsh, remove unessesary environment variables inherited from Windows
             if [[ ! "$SYS" =~ .*ZSH ]]; then
                 # remove environment variables, except those in 'keep'-array
                 local keep=(
-                    HOSTNAME LANG USER USERNAME HOME PWD PATH TERM
+                    HOSTNAME LANG USER USERNAME HOME PWD PATH TERM USERPROFILE
                     SYSTEMROOT PROFILEREAD _
                     "ProgramFiles" "CommonProgramFiles(x86)" "!::"
-                    # APPDATA LOCALAPPDATA USER PWD SHELL USERNAME HOSTNAMES
+                    # APPDATA LOCALAPPDATA SHELL
                 )
                 local remove=""
                 for ev in $(env | sed -e 's/=.*//'); do
@@ -94,7 +92,7 @@ case $(uname -s) in
             $(cygpath ${SYSTEMROOT})/system32/chcp.com 65001 &>/dev/null
         }
         env_Windows             # call env_Windows() function
-        unset -f env_Windows    # remove function
+        unset -f env_Windows    # remove env_Windows() function
         ;;
     # 
     *Linux)
@@ -119,7 +117,7 @@ if [[ ! "$SYS" =~ .*ZSH ]]; then
     [ -f ~/.bashrc ] && \
         source ~/.bashrc
 else
-    # zsh: git-cd.sh works only for bash
+    # zsh: cd() overload function only works for bash
     HAS_GIT=false
 fi
 
@@ -127,4 +125,4 @@ fi
 LC_COLLATE="C"
 
 # export environment variables
-export LANG HOSTNAME HOSTNAME_ALIAS PATH SYS HAS_GIT LC_COLLATE
+export RC LANG HOSTNAME HOSTNAME_ALIAS PATH SYS HAS_GIT LC_COLLATE

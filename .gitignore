@@ -9,6 +9,8 @@
 !.bashrc
 !.zprofile
 !.zshrc
+!.path_rc
+
 !.ansi-colors.sh
 
 !.minttyrc
