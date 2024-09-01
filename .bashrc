@@ -29,6 +29,8 @@
 # - cd()
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+echo .bashrc
+
 type shopt &>/dev/null && if [[ $? ]]; then
     # check window size after each command and update values of LINES and COLUMNS
     shopt -s checkwinsize
@@ -214,6 +216,7 @@ function color() {
             "ln"    blue \
             "or"    blue \
             "mi"    broken-link \
+            "*.zip" low-cyan \
             "*.tar" low-cyan \
             "*.jar" low-cyan \
         )
@@ -229,7 +232,8 @@ function color() {
         esac
         aliases color
 
-        [ "$HAS_GIT" = true ] && git config color.ui true
+        [ "$HAS_GIT" = true ] && \
+            $(git config color.ui true 2>/dev/null)
 
         export PROMPT_COLOR=true
         prompt
@@ -245,7 +249,8 @@ function color() {
         )
         aliases mono
 
-        [ "$HAS_GIT" = true ] && git config color.ui false
+        [ "$HAS_GIT" = true ] && \
+            $(git config color.ui false 2>/dev/null)
 
         export PROMPT_COLOR=false
         prompt
@@ -254,3 +259,9 @@ function color() {
 
 [ "$PROMPT_COLOR" ] && \
     color $PROMPT_COLOR || color $TERM_HAS_COLORS
+
+# cd to start directory, if passed as START_DIR environment variable
+[ "$START_DIR" ] && \
+    cd "$START_DIR"
+
+unset START_DIR      # remove start directory

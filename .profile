@@ -18,6 +18,8 @@
 # umask 022 permissions of new files are 644 (files) and 755 (directories)
 umask 022
 
+echo .profile
+
 # set LANG environment variable, otherwise git prints German messages
 LANG=en_US.UTF-8
 
@@ -47,7 +49,7 @@ case $(uname -s) in
             # https://medium.com/@linuxadminhacks/understanding-ifs-in-bash-scripting-3c67a39661e9
             IFS=@; for p in $(echo $PATH | tr ':' '@'); do
                 case "$p" in
-                *system32|*PowerShell*)         # |*WindowsApps*)
+                *system32|*PowerShell*) # |*WindowsApps*)
                     append_path+=":$(cygpath $p)"
                 esac
             done; unset IFS     # reset IFS to default values (space, tab, newline)
@@ -71,7 +73,7 @@ case $(uname -s) in
             if [[ ! "$SYS" =~ .*ZSH ]]; then
                 # remove environment variables, except those in 'keep'-array
                 local keep=(
-                    HOSTNAME LANG USER USERNAME HOME PWD PATH TERM USERPROFILE
+                    HOSTNAME LANG USER USERNAME HOME PWD PATH TERM USERPROFILE START_DIR
                     SYSTEMROOT PROFILEREAD _
                     "ProgramFiles" "CommonProgramFiles(x86)" "!::"
                     # APPDATA LOCALAPPDATA SHELL
@@ -83,6 +85,12 @@ case $(uname -s) in
                 done
                 unset $remove
             fi
+
+            # cygify Windows path to start directory passed in START_DIR environment variable
+            # IFS: disables spaces being treated as field separators in cygpath
+            [ "$START_DIR" ] && IFS=@ && \
+                export START_DIR=$(cygpath $(echo $START_DIR | tr -d '"')) && \
+                unset IFS
 
             # ignore Windows \r line ends, otherwise error: '\r': command not found in .bashrc
             (set -o igncr) 2>/dev/null && set -o igncr;
