@@ -2,8 +2,14 @@
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+echo ".zshrc"
+
 # run .bashrc
 [ -f .bashrc ] && source .bashrc $([ "$WINDIR" ] && echo "Win:ZSH" || echo "Mac:ZSH")
+
+unset -f prompt color
+function prompt() { : }
+function color() { : }
 
 # PROMPT=$(colorize_prompt true "${reg_prompt[@]}")
 # PROMPT=$'%{\e[32m%}> \u \h %{\e[0m%}'

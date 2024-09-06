@@ -15,10 +15,10 @@
 # turn on/off logging script execution
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+echo ".profile"
+
 # umask 022 permissions of new files are 644 (files) and 755 (directories)
 umask 022
-
-echo .profile
 
 # set LANG environment variable, otherwise git prints German messages
 LANG=en_US.UTF-8
@@ -116,18 +116,13 @@ case $(uname -s) in
 esac
 
 # except for .zsh, test git is installed
-if [[ ! "$SYS" =~ .*ZSH ]]; then
-    # none-zsh: test system has git installed, HAS_GIT: true, false
-    [ -z "$HAS_GIT" ] && \
-        HAS_GIT=$(git --version >/dev/null 2>/dev/null; [[ $? = 0 ]] && echo true || echo false)
-    # 
-    # bash does not automatically run .bashrc with new terminal, zsh runs .zshrc
-    [ -f ~/.bashrc ] && \
-        source ~/.bashrc
-else
-    # zsh: cd() overload function only works for bash
-    HAS_GIT=false
-fi
+# none-zsh: test system has git installed, HAS_GIT: true, false
+[ -z "$HAS_GIT" ] && \
+    HAS_GIT=$(git --version >/dev/null 2>/dev/null; [[ $? = 0 ]] && echo true || echo false)
+# 
+# bash does not automatically run .bashrc with new terminal, zsh runs .zshrc
+[ -f ~/.bashrc ] && \
+    source ~/.bashrc
 
 # show dotfiles first and not merged for 'ls'-list (as WSL:Ubuntu does)
 LC_COLLATE="C"

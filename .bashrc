@@ -29,7 +29,7 @@
 # - cd()
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-echo .bashrc
+echo ".bashrc"
 
 type shopt &>/dev/null && if [[ $? ]]; then
     # check window size after each command and update values of LINES and COLUMNS
@@ -62,7 +62,8 @@ export HISTFILESIZE=999
 [ "$HAS_GIT" = true ] && \
     function cd() {
         local prior_value_of_GIT_PROJECT=$GIT_PROJECT
-        local cd_path=$( [ -z "$1" ] && echo $HOME || echo $1 ); shift
+        # 
+        [ "$1" ] && local cd_path=$1 && shift || local cd_path=$HOME
         # 
         # actually change directory
         builtin cd "$cd_path" $*
@@ -70,7 +71,7 @@ export HISTFILESIZE=999
         export PWD=$(realpath . )   # set '\w' in PS1 prompt string
         local git_project=""
         local dir=$PWD
-        #
+        # 
         while [ "$dir" != "/" -a "$dir" != "$HOME" ]; do
             [ -d "$dir/.git" ] && \
                 git_project=$(basename "$dir") && \
@@ -89,13 +90,14 @@ export HISTFILESIZE=999
         # test git-project was entered for the first time
         if [ -z "$prior_value_of_GIT_PROJECT" -a "$GIT_PROJECT" ]; then
             # sourcing when $GIT_PROJECT is entered
-            # echo "entering GIT_PROJECT in: $dir"
-            [ -f "$dir"/.env.sh ] && source "$dir"/.env.sh "$GIT_PROJECT" "$dir" && setup
+            echo "entering GIT_PROJECT: $dir"
+            [ -f "$dir"/.env.sh ] && source "$dir"/.env.sh "$GIT_PROJECT" "$dir"
         fi
+        # 
         if [ "$prior_value_of_GIT_PROJECT" -a -z "$GIT_PROJECT" ]; then
             # wiping when leaving project
-            # echo "leaving GIT_PROJECT: $prior_value_of_GIT_PROJECT"
-            [ "$(typeset -f wipe)" ] && wipe "$prior_value_of_GIT_PROJECT" "$dir"
+            echo "leaving GIT_PROJECT: $prior_value_of_GIT_PROJECT"
+            [ "$(typeset -f leave)" ] && leave "$prior_value_of_GIT_PROJECT" "$dir"
         fi
     }
 
@@ -121,14 +123,18 @@ function aliases() {
         alias log="git log --oneline"
 
     function rp() {     # show realpath of $1
-        [[ "$1" ]] && realpath $* || realpath .
+        [ "$1" ] && realpath $* || realpath .
     }
     function h() {      # list history commands, select by $1
-        [[ "$1" == "--all" ]] && history | uniq -f 1 && return
-        [[ "$1" ]] && history | grep $1 | uniq -f 1 || history | tail -40
+        [ "$1" == "--all" ] && history | uniq -f 1 && return
+        [ "$1" ] && history | grep $1 | uniq -f 1 || history | tail -40
+    }
+    function functions() {  # list functions by name or specific function
+        local fname="$1"
+        [ "$fname" ] && typeset -f $fname || declare -F
     }
     function crlf() {   # list text files with CR/LF (Windows) line endings
-        [[ "$1" ]] && local dir="$*" || local dir="."
+        [ "$1" ] && local dir="$*" || local dir="."
         find "$dir" -not -type d -exec file "{}" ";" | grep CRLF | cut -d: -f1
     }
     function cr2lf() {  # replace CR/LF (Windows) with newline (Unix) line endings
@@ -257,8 +263,13 @@ function color() {
     fi
 }
 
-[ "$PROMPT_COLOR" ] && \
-    color $PROMPT_COLOR || color $TERM_HAS_COLORS
+if [[ ! "$SYS" =~ .*ZSH ]]; then
+    [ "$PROMPT_COLOR" ] && \
+        color $PROMPT_COLOR || color $TERM_HAS_COLORS
+else
+    # zsh only set aliases, but no color or prompt
+    aliases
+fi
 
 # cd to start directory, if passed as START_DIR environment variable
 [ "$START_DIR" ] && \
