@@ -5,6 +5,7 @@
 # - HOSTNAME_ALIAS: alias name for system hostname, e.g. 'X1' for 'LAPTOP-V50CGD0T'
 # - HAS_GIT: true, false
 # - ZSH: set in zsh
+# - ENV_SH: source this file when entering directory of a git project, e.g. '.env.sh'
 # 
 # .bashrc:
 # - TERM_HAS_COLORS: true, false
@@ -88,16 +89,17 @@ export HISTFILESIZE=999
         prompt
 
         # test git-project was entered for the first time
-        if [ -z "$prior_value_of_GIT_PROJECT" -a "$GIT_PROJECT" ]; then
+        if [ -z "$prior_value_of_GIT_PROJECT" -a "$GIT_PROJECT" -a "$ENV_SH" ]; then
             # sourcing when $GIT_PROJECT is entered
             echo "entering GIT_PROJECT: $dir"
-            [ -f "$dir"/.env.sh ] && source "$dir"/.env.sh "$GIT_PROJECT" "$dir"
+            [ -f "$dir"/$ENV_SH ] && source "$dir"/$ENV_SH "$GIT_PROJECT" "$dir"
         fi
         # 
         if [ "$prior_value_of_GIT_PROJECT" -a -z "$GIT_PROJECT" ]; then
-            # wiping when leaving project
-            echo "leaving GIT_PROJECT: $prior_value_of_GIT_PROJECT"
+            # echo "leaving GIT_PROJECT: $prior_value_of_GIT_PROJECT"
+            # invoke 'leave()' function if set by project environment
             [ "$(typeset -f leave)" ] && leave "$prior_value_of_GIT_PROJECT" "$dir"
+            unset prior_value_of_GIT_PROJECT
         fi
     }
 

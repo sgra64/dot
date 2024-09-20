@@ -9,7 +9,7 @@
 #   - .zprofile calls --> .profile
 #   - .zshrc calls --> .bashrc
 # 
-# export TERM=xterm-256color
+# TERM=xterm-256color
 # printf '\033[8;56;80t'
 
 # turn on/off logging script execution
@@ -20,29 +20,34 @@ echo ".profile"
 # umask 022 permissions of new files are 644 (files) and 755 (directories)
 umask 022
 
-# set LANG environment variable, otherwise git prints German messages
+# set LANG environment variable (otherwise git may print German messages)
 LANG=en_US.UTF-8
 
+# source this file when entering directory of a git project
+ENV_SH=".env.sh"
+
+# show dotfiles first and not merged for 'ls'-list (as WSL:Ubuntu does)
+LC_COLLATE="C"
+
+# map hostname to nicer looking alias
 HOSTNAME=$(hostname)
 case "$HOSTNAME" in
-    LAPTOP-V50CGD0T)
-        HOSTNAME_ALIAS="X1-Carbon" ;;
+    LAPTOP-V50CGD0T)    HOSTNAME_ALIAS="X1-Carbon" ;;
 esac
 
 case $(uname -s) in
     # 
     CYGW*|MINGW*)
-        SYS=$1              # set "Win:ZSH" or "Mac:ZSH" passed from .zprofile
-        [ "$MSYSTEM" ] && SYS="Win:MINGW"   # set as GitBash mingw
-        [ -z "$SYS" ] && SYS="Win:CYGWIN"   # otherwise, set for cygwin
+        SYS=$1       # set "Win:ZSH" or "Mac:ZSH" passed from .zprofile
+        [ "$MSYSTEM" ] && SYS="Win:MINGW"    # set as GitBash mingw
+        [ -z "$SYS" ] && SYS="Win:CYGWIN"    # otherwise, set for cygwin
         # 
         function env_Windows() {
             # set/reset environment variables coming from Windows
-            export USER=$(whoami)       # reset $USERID
-            export USERNAME=${USER}     # reset $USERNAME
-            export HOME=$(realpath $HOME)   # resolve linked $HOME
-            export PWD=$HOME    # used by '\w' in PS1 prompt string
-
+            USER=$(whoami)       # reset $USERID
+            USERNAME=${USER}     # reset $USERNAME
+            HOME=$(realpath $HOME)   # resolve linked $HOME
+            PWD=$HOME    # used by '\w' in PS1 prompt string
             # local append_path="$(cygpath ${SYSTEMROOT}):$(cygpath ${SYSTEMROOT})/system32"
             local append_path="$(cygpath ${SYSTEMROOT})"
             # 
@@ -67,14 +72,12 @@ case $(uname -s) in
             [ -d "$git_path" ] && PATH="${PATH}:$git_path"
             [ -d "$vscode_path" ] && PATH="${PATH}:$vscode_path"
             # 
-            export PATH
-
             # except for zsh, remove unessesary environment variables inherited from Windows
             if [[ ! "$SYS" =~ .*ZSH ]]; then
                 # remove environment variables, except those in 'keep'-array
                 local keep=(
-                    HOSTNAME LANG USER USERNAME HOME PWD PATH TERM USERPROFILE START_DIR
-                    SYSTEMROOT PROFILEREAD _
+                    LANG ENV_SH LC_COLLATE HOSTNAME HOSTNAME_ALIAS SYS PATH USER USERNAME HOME PWD HAS_GIT
+                    START_DIR TERM USERPROFILE SYSTEMROOT PROFILEREAD _
                     "ProgramFiles" "CommonProgramFiles(x86)" "!::"
                     # APPDATA LOCALAPPDATA SHELL
                 )
@@ -89,7 +92,7 @@ case $(uname -s) in
             # cygify Windows path to start directory passed in START_DIR environment variable
             # IFS: disables spaces being treated as field separators in cygpath
             [ "$START_DIR" ] && IFS=@ && \
-                export START_DIR=$(cygpath $(echo $START_DIR | tr -d '"')) && \
+                START_DIR=$(cygpath $(echo $START_DIR | tr -d '"')) && \
                 unset IFS
 
             # ignore Windows \r line ends, otherwise error: '\r': command not found in .bashrc
@@ -115,17 +118,15 @@ case $(uname -s) in
     *) echo '~/.profile: $(uname -s) unmatched' ;;
 esac
 
-# except for .zsh, test git is installed
+# test git is installed (except for .zsh)
 # none-zsh: test system has git installed, HAS_GIT: true, false
 [ -z "$HAS_GIT" ] && \
     HAS_GIT=$(git --version >/dev/null 2>/dev/null; [[ $? = 0 ]] && echo true || echo false)
-# 
+
 # bash does not automatically run .bashrc with new terminal, zsh runs .zshrc
 [ -f ~/.bashrc ] && \
     source ~/.bashrc
 
-# show dotfiles first and not merged for 'ls'-list (as WSL:Ubuntu does)
-LC_COLLATE="C"
-
-# export environment variables
-export RC LANG HOSTNAME HOSTNAME_ALIAS PATH SYS HAS_GIT LC_COLLATE
+# export environment variables to be effective in sub-processes
+export LANG ENV_SH LC_COLLATE HOSTNAME HOSTNAME_ALIAS SYS \
+        PATH USER USERNAME HOME PWD HAS_GIT
