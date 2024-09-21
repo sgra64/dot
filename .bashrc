@@ -13,8 +13,8 @@
 # - LS_COLORS: 
 # - PROMPT_COLOR: color, mono
 # 
-# - aliases()
-# - prompt()
+# - build_aliases()
+# - build_prompt()
 # - color(): on, off, true, false
 # 
 # .env-windows.sh
@@ -84,9 +84,9 @@ export HISTFILESIZE=999
             local path=$(pwd) && \
             export GIT_PATH=${path/"$dir"/\.} || unset GIT_PATH
         # 
-        # rebuild PS1 using the prompt function
+        # rebuild PS1 using the build_prompt function
         export GIT_PROJECT=$git_project
-        prompt
+        build_prompt
 
         # test git-project was entered for the first time
         if [ -z "$prior_value_of_GIT_PROJECT" -a "$GIT_PROJECT" -a "$ENV_SH" ]; then
@@ -103,10 +103,11 @@ export HISTFILESIZE=999
         fi
     }
 
-function aliases() {
+function build_aliases() {
     [ "$1" = "color" ] && local color="--color=auto" || local mvn_mono="-B"
     # 
     alias c="clear"
+    alias aliases="alias"
     alias vi="vim"              # use vim for vi, -u ~/.vimrc
     alias ls="/bin/ls $color"   # colorize ls output
     alias l="ls -alFog"         # detailed list with dotfiles
@@ -136,6 +137,13 @@ function aliases() {
         fi
         echo "sourcing: $dotfile"; builtin source "$dotfile"
     }
+    function env() {    # show environment variables
+        [ "$1" == "--names" ] && /usr/bin/env | sed -e 's/=.*//' && return
+        [ "$1" ] && \
+            for var in "$@"; do
+                echo -ne "$var="; eval 'echo $'$var
+            done || /usr/bin/env
+    }
     function rp() {     # show realpath of $1
         [ "$1" ] && realpath $* || realpath .
     }
@@ -161,7 +169,7 @@ function aliases() {
     }
 }
 
-function prompt() {
+function build_prompt() {
     # 
     if [ -z "$GIT_PROJECT" ]; then
         # no $GIT_PROJECT variable set means regular prompt (not inside git project)
@@ -250,13 +258,13 @@ function color() {
                 "or"    cyan \
             ) ;;
         esac
-        aliases color
+        build_aliases color
 
         [ "$HAS_GIT" = true ] && \
             $(git config color.ui true 2>/dev/null)
 
         export PROMPT_COLOR=true
-        prompt
+        build_prompt
     # 
     else
         export TERM="xterm-mono"
@@ -267,13 +275,13 @@ function color() {
             "cd" 0 "or" 0 "mi" 0 "su" 0 "sg" 0 "ca" 0 "tw" 0 "ow" 0 \
             "st" 0 "ex" 0 \
         )
-        aliases mono
+        build_aliases mono
 
         [ "$HAS_GIT" = true ] && \
             $(git config color.ui false 2>/dev/null)
 
         export PROMPT_COLOR=false
-        prompt
+        build_prompt
     fi
 }
 
@@ -282,7 +290,7 @@ if [[ ! "$SYS" =~ .*ZSH ]]; then
         color $PROMPT_COLOR || color $TERM_HAS_COLORS
 else
     # zsh only set aliases, but no color or prompt
-    aliases
+    build_aliases
 fi
 
 # cd to start directory, if passed as START_DIR environment variable
