@@ -87,6 +87,15 @@ case $(uname -s) in
                         remove+="$ev "
                 done
                 unset $remove
+                # 
+                # remove unwanted inherited functions, e.g. gawklibpath_append, etc.
+                keep=(env_Windows)
+                remove=""
+                for f in $(declare -F | sed -e 's/declare -f //'); do
+                    [[ "${keep[@]}" =~ "$f" ]] || \
+                        remove+="$f "
+                done
+                unset -f $remove
             fi
 
             # cygify Windows path to start directory passed in START_DIR environment variable
