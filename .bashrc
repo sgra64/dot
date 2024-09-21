@@ -38,19 +38,19 @@ type shopt &>/dev/null && if [[ $? ]]; then
     # append to the history file, don't overwrite it
     shopt -s histappend
 fi
-# https://www.baeldung.com/linux/history-remove-avoid-duplicates
 # don't put duplicate lines or lines with whitespaces in history
+# https://www.baeldung.com/linux/history-remove-avoid-duplicates
 export HISTCONTROL=ignoreboth:erasedups
 export HISTSIZE=999
 export HISTFILESIZE=999
 
 # source PATH variable from ~/.pathrc file for Windows environment
 [ -f ~/.path_rc ] && [[ "$SYS" =~ Win:. ]] && \
-    source ~/.path_rc
+    builtin source ~/.path_rc
 
 # source color control functions for ANSI terminals
 [ -f ~/.ansi-colors.sh ] && \
-    source ~/.ansi-colors.sh
+    builtin source ~/.ansi-colors.sh
 
 [ -z "$TERM_HAS_COLORS" ] && \
     export TERM_HAS_COLORS=$([[ "$(tput colors)" -gt 1 ]] && \
@@ -92,7 +92,7 @@ export HISTFILESIZE=999
         if [ -z "$prior_value_of_GIT_PROJECT" -a "$GIT_PROJECT" -a "$ENV_SH" ]; then
             # sourcing when $GIT_PROJECT is entered
             echo "entering GIT_PROJECT: $dir"
-            [ -f "$dir"/$ENV_SH ] && source "$dir"/$ENV_SH "$GIT_PROJECT" "$dir"
+            [ -f "$dir"/$ENV_SH ] && builtin source "$dir"/$ENV_SH "$GIT_PROJECT" "$dir"
         fi
         # 
         if [ "$prior_value_of_GIT_PROJECT" -a -z "$GIT_PROJECT" ]; then
@@ -118,12 +118,24 @@ function aliases() {
     [ "$MAVEN_HOME" ] && \
         alias mvn="$MAVEN_HOME/bin/mvn $mvn_mono"   # -B: color off
     # 
-    # set useful git aliases \
+    # set useful git aliases
+    #  - prune, https://stackoverflow.com/questions/2116778/reduce-git-repository-size
     [ "$HAS_GIT" = true ] && \
         alias gt="git status" && \
         alias switch="git switch" && \
-        alias log="git log --oneline"
+        alias log="git log --oneline" && \
+        alias br="git branch -avv" && \
+        alias prune="git reflog expire --expire=now --all; git gc --prune=now --aggressive" && \
+        alias gar="[ -d .git ] && tar cvf $(date '+%y-%m%d-git.tar') .git || echo 'no .git directory'"
 
+    function source() { # source dotfile depending on $1 and location
+        if [ -z "$1" ]; then
+            [ -f "$ENV_SH" ] && local dotfile="$ENV_SH" || local dotfile="$HOME/.bashrc"
+        else
+            local dotfile="$1"
+        fi
+        echo "sourcing: $dotfile"; builtin source "$dotfile"
+    }
     function rp() {     # show realpath of $1
         [ "$1" ] && realpath $* || realpath .
     }
@@ -274,6 +286,7 @@ else
 fi
 
 # cd to start directory, if passed as START_DIR environment variable
+# when shell is started in arbitrary directory, e.g. from context menu
 [ "$START_DIR" ] && \
     cd "$START_DIR"
 
